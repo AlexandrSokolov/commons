@@ -1,15 +1,22 @@
 package com.savdev.commons;
 
-import com.google.common.io.Files;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 
 public class TestUtils {
 
   private TestUtils() {
     throw new AssertionError("Utility class cannot be instantiated");
+  }
+
+  public static String fromTemplate(
+    Map<String, String> m,
+    String template){
+    return new StringSubstitutor(m).replace(template);
   }
 
   public static String testResourceFolderFullPath(final String folderName) {
