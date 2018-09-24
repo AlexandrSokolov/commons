@@ -18,7 +18,7 @@ public class CsvReaderStreamTest {
       StandardCharsets.UTF_8,
       SINGLE_CHAR_LINE_SEPARATOR,
       ",",
-      CsvReader.BUFFER_SIZE).csvLines()
+      BUFFER_SIZE).csvLines()
       .forEach(csvRecordAsMap -> {
         if (processedLine[0] == 0) {
           Assert.assertTrue(csvRecordAsMap.size() == 2);

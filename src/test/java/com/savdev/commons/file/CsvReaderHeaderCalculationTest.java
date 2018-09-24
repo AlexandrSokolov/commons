@@ -14,6 +14,8 @@ import static com.savdev.commons.TestUtils.fromTemplate;
 
 public class CsvReaderHeaderCalculationTest {
 
+  static final int BUFFER_SIZE = 12048;
+
   static final String COL1 = "col1";
   static final String COL2 = "col2";
   static final String LINE1_VAL1 = "val1";
@@ -57,11 +59,8 @@ public class CsvReaderHeaderCalculationTest {
       StandardCharsets.UTF_8,
       SINGLE_CHAR_LINE_SEPARATOR,
       ",",
-      CsvReader.BUFFER_SIZE);
-    Assert.assertEquals(
-      fromTemplate(m, INPUT1_TEMPLATE)
-          .indexOf(SINGLE_CHAR_LINE_SEPARATOR)
-        + SINGLE_CHAR_LINE_SEPARATOR.length(), r.headerPosition());
+      BUFFER_SIZE);
+    r.calculateHeaders();
     validateHeaderMap(r);
   }
 
@@ -76,11 +75,8 @@ public class CsvReaderHeaderCalculationTest {
       StandardCharsets.UTF_8,
       MULTIPLE_CHARS_LINE_SEPARATOR,
       ",",
-      CsvReader.BUFFER_SIZE);
-    Assert.assertEquals(
-      INPUT2.indexOf(MULTIPLE_CHARS_LINE_SEPARATOR) +
-        MULTIPLE_CHARS_LINE_SEPARATOR.length(),
-      r.headerPosition());
+      BUFFER_SIZE);
+    r.calculateHeaders();
     validateHeaderMap(r);
   }
 
@@ -96,10 +92,7 @@ public class CsvReaderHeaderCalculationTest {
       SINGLE_CHAR_LINE_SEPARATOR,
       ",",
       fromTemplate(m, INPUT1_TEMPLATE).indexOf(SINGLE_CHAR_LINE_SEPARATOR));
-    Assert.assertEquals(
-      fromTemplate(m, INPUT1_TEMPLATE).indexOf(SINGLE_CHAR_LINE_SEPARATOR) +
-        SINGLE_CHAR_LINE_SEPARATOR.length(),
-      r.headerPosition());
+    r.calculateHeaders();
     validateHeaderMap(r);
   }
 
@@ -115,10 +108,7 @@ public class CsvReaderHeaderCalculationTest {
       MULTIPLE_CHARS_LINE_SEPARATOR,
       ",",
       INPUT2.indexOf(MULTIPLE_CHARS_LINE_SEPARATOR));
-    Assert.assertEquals(
-      INPUT2.indexOf(MULTIPLE_CHARS_LINE_SEPARATOR) +
-        MULTIPLE_CHARS_LINE_SEPARATOR.length(),
-      r.headerPosition());
+    r.calculateHeaders();
     validateHeaderMap(r);
   }
 
@@ -134,10 +124,7 @@ public class CsvReaderHeaderCalculationTest {
       SINGLE_CHAR_LINE_SEPARATOR,
       ",",
       2);
-    Assert.assertEquals(
-      fromTemplate(m, INPUT1_TEMPLATE).indexOf(SINGLE_CHAR_LINE_SEPARATOR) +
-        SINGLE_CHAR_LINE_SEPARATOR.length(),
-      r.headerPosition());
+    r.calculateHeaders();
     validateHeaderMap(r);
   }
 
@@ -154,10 +141,7 @@ public class CsvReaderHeaderCalculationTest {
       MULTIPLE_CHARS_LINE_SEPARATOR,
       ",",
       4);
-    Assert.assertEquals(
-      INPUT2.indexOf(MULTIPLE_CHARS_LINE_SEPARATOR) +
-        MULTIPLE_CHARS_LINE_SEPARATOR.length(),
-      r.headerPosition());
+    r.calculateHeaders();
     validateHeaderMap(r);
   }
 
@@ -174,10 +158,7 @@ public class CsvReaderHeaderCalculationTest {
       MULTIPLE_CHARS_LINE_SEPARATOR,
       ",",
       MULTIPLE_CHARS_LINE_SEPARATOR.length() - 1);
-    Assert.assertEquals(
-      INPUT2.indexOf(MULTIPLE_CHARS_LINE_SEPARATOR) +
-        MULTIPLE_CHARS_LINE_SEPARATOR.length(),
-      r.headerPosition());
+    r.calculateHeaders();
     validateHeaderMap(r);
   }
 
