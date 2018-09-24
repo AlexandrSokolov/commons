@@ -55,8 +55,8 @@ public class CsvColumnMetadata {
   public static class CsvColumnMetadataBuilder {
     private int columnPosition;
     private String columnName;
-    private String startSeparator;
-    private String endSeparator;
+    private String startSeparator = "";
+    private String endSeparator = "";
 
     public CsvColumnMetadataBuilder position(int columnPosition) {
       this.columnPosition = columnPosition;

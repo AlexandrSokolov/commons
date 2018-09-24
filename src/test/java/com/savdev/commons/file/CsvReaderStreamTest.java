@@ -14,7 +14,7 @@ public class CsvReaderStreamTest {
   public void testStream(){
     final int[] processedLine = {0};
     new CsvReader(
-      IOUtils.toInputStream(fromTemplate(m, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
+      IOUtils.toInputStream(fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
       StandardCharsets.UTF_8,
       SINGLE_CHAR_LINE_SEPARATOR,
       ",",

@@ -147,7 +147,7 @@ public class Storage {
       for(
         int searchPos = 0, el = (list == currentReadPosition.listPosition)
           ? currentReadPosition.arrayPosition : 0;
-        el + searchPos < storage.get(list).actualSize; el ++){
+        el + searchPos < storage.get(list).actualSize; el++){
         for (;
              (el + searchPos < storage.get(list).actualSize)
                && searchPos < Math.min(search.length(), storage.get(list).actualSize);
@@ -169,6 +169,7 @@ public class Storage {
           } else {
             partlyFoundPosition = null;
             foundSymbols = 0;
+            searchPos = 0;
             break;
           }
         }

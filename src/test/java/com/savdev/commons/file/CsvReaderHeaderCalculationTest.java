@@ -1,8 +1,6 @@
 package com.savdev.commons.file;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.text.StringSubstitutor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,29 +22,32 @@ public class CsvReaderHeaderCalculationTest {
   static final String LINE2_VAL2 = "val4";
 
   static final String SINGLE_CHAR_LINE_SEPARATOR = "|";
-  static final Map<String, String> m = new HashMap<>();
-  static {
-    m.put("s", SINGLE_CHAR_LINE_SEPARATOR);
-    m.put("col1", COL1);
-    m.put("col2", COL2);
-    m.put("val1", LINE1_VAL1);
-    m.put("val2", LINE1_VAL2);
-    m.put("val3", LINE2_VAL1);
-    m.put("val4", LINE2_VAL2);
-  }
-  static final String INPUT1_TEMPLATE =
-    "${col1},${col2}${s}${val1},val2${s}${val3},${val4}";
-
-
+  static final String SINGLE_CHAR_COLUMN_SEPARATOR = ",";
   static final String MULTIPLE_CHARS_LINE_SEPARATOR = "|||";
-  static final String INPUT2 = new StringSubstitutor(
-    ImmutableMap.of(
-      "s", MULTIPLE_CHARS_LINE_SEPARATOR,
-      "col1", COL1,
-      "col2", COL2)).replace(
-    "${col1},${col2}${s}val1,val2${s}val3,val4");
+  static final String INPUT1_TEMPLATE =
+    "${col1}${colSep}${col2}${s}${val1}${colSep}${val2}${s}${val3}${colSep}${val4}";
+  static final String INPUT_SINGLE_LINE_TEMPLATE_WITH_FINAL_SEP =
+    "${col1}${colSep}${col2}${s}${val1}${colSep}${val2}${s}";
+  static final String INPUT_SINGLE_LINE_TEMPLATE_WITHOUT_FINAL_SEP =
+    "${col1}${colSep}${col2}${s}${val1}${colSep}${val2}";
 
+  static final Map<String, String> singleChLineSingleChColumn = new HashMap<>();
+  static {
+    singleChLineSingleChColumn.put("s", SINGLE_CHAR_LINE_SEPARATOR);
+    singleChLineSingleChColumn.put("colSep", SINGLE_CHAR_COLUMN_SEPARATOR);
+    singleChLineSingleChColumn.put("col1", COL1);
+    singleChLineSingleChColumn.put("col2", COL2);
+    singleChLineSingleChColumn.put("val1", LINE1_VAL1);
+    singleChLineSingleChColumn.put("val2", LINE1_VAL2);
+    singleChLineSingleChColumn.put("val3", LINE2_VAL1);
+    singleChLineSingleChColumn.put("val4", LINE2_VAL2);
+  }
 
+  static final Map<String, String> multiChLineSingleChColumn = new HashMap<>();
+  static {
+    multiChLineSingleChColumn.putAll(singleChLineSingleChColumn);
+    multiChLineSingleChColumn.put("s", MULTIPLE_CHARS_LINE_SEPARATOR);
+  }
 
   /**
    * buffer size bigger than the fst line separator
@@ -55,7 +56,7 @@ public class CsvReaderHeaderCalculationTest {
   @Test
   public void testHeaderPositionBufferBiggerSingleCharSeparator() {
     CsvReader r = new CsvReader(
-      IOUtils.toInputStream(fromTemplate(m, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
+      IOUtils.toInputStream(fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
       StandardCharsets.UTF_8,
       SINGLE_CHAR_LINE_SEPARATOR,
       ",",
@@ -71,7 +72,8 @@ public class CsvReaderHeaderCalculationTest {
   @Test
   public void testHeaderPositionBufferBiggerMultipleCharsSeparator() {
     CsvReader r = new CsvReader(
-      IOUtils.toInputStream(INPUT2, StandardCharsets.UTF_8),
+      IOUtils.toInputStream(fromTemplate(
+        multiChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
       StandardCharsets.UTF_8,
       MULTIPLE_CHARS_LINE_SEPARATOR,
       ",",
@@ -87,11 +89,11 @@ public class CsvReaderHeaderCalculationTest {
   @Test
   public void testHeaderPositionBufferEqualsSingleCharSeparator() {
     CsvReader r = new CsvReader(
-      IOUtils.toInputStream(fromTemplate(m, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
+      IOUtils.toInputStream(fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
       StandardCharsets.UTF_8,
       SINGLE_CHAR_LINE_SEPARATOR,
       ",",
-      fromTemplate(m, INPUT1_TEMPLATE).indexOf(SINGLE_CHAR_LINE_SEPARATOR));
+      fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE).indexOf(SINGLE_CHAR_LINE_SEPARATOR));
     r.calculateHeaders();
     validateHeaderMap(r);
   }
@@ -103,11 +105,13 @@ public class CsvReaderHeaderCalculationTest {
   @Test
   public void testHeaderPositionBufferEqualsMultipleCharsSeparator() {
     CsvReader r = new CsvReader(
-      IOUtils.toInputStream(INPUT2, StandardCharsets.UTF_8),
+      IOUtils.toInputStream(
+        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
       StandardCharsets.UTF_8,
       MULTIPLE_CHARS_LINE_SEPARATOR,
       ",",
-      INPUT2.indexOf(MULTIPLE_CHARS_LINE_SEPARATOR));
+      fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE)
+        .indexOf(MULTIPLE_CHARS_LINE_SEPARATOR));
     r.calculateHeaders();
     validateHeaderMap(r);
   }
@@ -119,7 +123,7 @@ public class CsvReaderHeaderCalculationTest {
   @Test
   public void testHeaderPositionBufferSmallerSingleCharSeparator() {
     CsvReader r = new CsvReader(
-      IOUtils.toInputStream(fromTemplate(m, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
+      IOUtils.toInputStream(fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
       StandardCharsets.UTF_8,
       SINGLE_CHAR_LINE_SEPARATOR,
       ",",
@@ -136,7 +140,8 @@ public class CsvReaderHeaderCalculationTest {
   @Test
   public void testHeaderPositionBufferSmallerMultipleCharsSeparator() {
     CsvReader r = new CsvReader(
-      IOUtils.toInputStream(INPUT2, StandardCharsets.UTF_8),
+      IOUtils.toInputStream(
+        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
       StandardCharsets.UTF_8,
       MULTIPLE_CHARS_LINE_SEPARATOR,
       ",",
@@ -153,7 +158,8 @@ public class CsvReaderHeaderCalculationTest {
   @Test
   public void testHeaderPositionBufferSmallerMultipleCharsSeparator2() {
     CsvReader r = new CsvReader(
-      IOUtils.toInputStream(INPUT2, StandardCharsets.UTF_8),
+      IOUtils.toInputStream(
+        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
       StandardCharsets.UTF_8,
       MULTIPLE_CHARS_LINE_SEPARATOR,
       ",",

@@ -57,21 +57,30 @@ public class CsvReader {
         });
     } else {
       throw new IllegalArgumentException(
-        String.format("Could not find csv line separator %s", csvLineSeparator));
+        String.format("Could not find csv line separator %s, header = 's'",
+          csvLineSeparator, storage.value()));
     }
   }
 
   void handleCsvLine(){
     csvRecord = Maps.newHashMap();
     csvHeader.entrySet().stream()
+      .filter(e -> !noMoreData)
       .forEach(entry -> {
         if (entry.getKey() == (csvHeader.size() -1)){ //the last column
           handleColumn(csvHeader.size()-1,
             csvLineSeparator, ()-> {
               //the last column in the last line:
-              csvRecord.put(csvHeader.get(csvHeader.size() - 1).columnName, storage.value());
+              String value = storage.value();
+              CsvColumnMetadata lastColumn = csvHeader.get(csvHeader.size() - 1);
+              csvRecord.put(lastColumn.columnName,
+                value.substring(lastColumn.startSeparator.length(),
+                  value.length() - lastColumn.startSeparator.length()));
               noMoreData = true;
             });
+        } else if (entry.getKey() == 0) {
+          handleColumn(entry.getKey(),
+            csvColumnSeparator, ()-> noMoreData = true);
         } else {
           handleColumn(entry.getKey(),
             csvColumnSeparator, ()-> {
@@ -99,7 +108,10 @@ public class CsvReader {
       final Position p = storage.positionOf(
         csvHeader.get(columnPosition).endSeparator);
       if (p.isFound){
-        csvRecord.put(csvHeader.get(columnPosition).columnName, storage.value(p));
+        csvRecord.put(
+          csvHeader.get(columnPosition).columnName,
+          storage.value(p)
+            .substring(csvHeader.get(columnPosition).startSeparator.length()));
       } else {
         //the last column in the last line:
         notFound.execute();
@@ -128,7 +140,7 @@ public class CsvReader {
             csvHeader.get(columnPosition).endSeparator);
           if (p.isFound) {
             csvRecord.put(csvHeader.get(columnPosition).columnName,
-              value.substring(1) + storage.value(p));
+              value.substring(1) + separator + storage.value(p));
           } else {
             notFound.execute();
           }
