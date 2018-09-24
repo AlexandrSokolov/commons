@@ -3,6 +3,7 @@ package com.savdev.commons.config;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -103,7 +104,8 @@ class PropertiesValuesValidator {
       .filter(f -> f.getAnnotation(NullableProperty.class) == null)
       .map(f -> {
         try {
-          return (String) f.get(null);
+          return (String) FieldUtils.readDeclaredStaticField(
+            clazz, f.getName(), true);
         } catch (IllegalAccessException e) {
           throw new IllegalStateException(e);
         }
@@ -125,7 +127,8 @@ class PropertiesValuesValidator {
         && String.class.equals(f.getType())))
       .map(f -> {
         try {
-          return (String) f.get(null);
+          return (String) FieldUtils.readDeclaredStaticField(
+            clazz, f.getName(), true);
         } catch (IllegalAccessException e) {
           throw new IllegalStateException(e);
         }
@@ -142,7 +145,8 @@ class PropertiesValuesValidator {
         && String.class.equals(f.getType())))
       .map(f -> {
         try {
-          return (String) f.get(null);
+          return (String) FieldUtils.readDeclaredStaticField(
+            clazz, f.getName(), true);
         } catch (IllegalAccessException e) {
           throw new IllegalStateException(e);
         }
@@ -162,7 +166,8 @@ class PropertiesValuesValidator {
       .filter(f -> f.getAnnotation(MapProperty.class) == null)
       .map(f -> {
         try {
-          return (String) f.get(null);
+          return (String) FieldUtils.readDeclaredStaticField(
+            clazz, f.getName(), true);
         } catch (IllegalAccessException e) {
           throw new IllegalStateException(e);
         }
