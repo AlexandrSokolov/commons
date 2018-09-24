@@ -25,6 +25,11 @@ public class CsvReaderHandleLineTest {
   static final String QUOTED2_1_WITH_SEP = "\"value 2_1 ${s} in Quotes\"";
   static final String QUOTED2_2_WITH_SEP = "\"value 2_2 ${s} in Quotes\"";
 
+  static final String QUOTED1_1_WITH_2SEP = "\"value ${l} 1_1 ${s} in Quotes\"";
+  static final String QUOTED1_2_WITH_2SEP = "\"value ${l} 1_2 ${s} in Quotes\"";
+  static final String QUOTED2_1_WITH_2SEP = "\"value ${l} 2_1 ${s} in Quotes\"";
+  static final String QUOTED2_2_WITH_2SEP = "\"value ${l} 2_2 ${s} in Quotes\"";
+
   /**
    * Buffer bigger than input
    * Single char column separator
@@ -252,6 +257,59 @@ public class CsvReaderHandleLineTest {
     String v4 = fromTemplate(
       ImmutableMap.of("s", MULTIPLE_CHARS_LINE_SEPARATOR),
       QUOTED2_2_WITH_SEP);
+    map.put(LINE2_VAL2, v4);
+    String input = fromTemplate(map, INPUT1_TEMPLATE);
+    CsvReader r = new CsvReader(
+      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
+      StandardCharsets.UTF_8,
+      MULTIPLE_CHARS_LINE_SEPARATOR,
+      SINGLE_CHAR_COLUMN_SEPARATOR,
+      BUFFER_SIZE);
+    r.calculateHeaders();
+    Assert.assertTrue(r.csvRecord.isEmpty());
+    r.handleCsvLine();
+    Assert.assertFalse(r.csvRecord.isEmpty());
+    Assert.assertEquals(v1.substring(1, v1.length()-1), r.csvRecord.get(COL1));
+    Assert.assertEquals(v3.substring(1, v1.length()-1), r.csvRecord.get(COL2));
+
+    r.handleCsvLine();
+    Assert.assertFalse(r.csvRecord.isEmpty());
+    Assert.assertEquals(v2.substring(1, v1.length()-1), r.csvRecord.get(COL1));
+    Assert.assertEquals(v4.substring(1, v1.length()-1), r.csvRecord.get(COL2));
+  }
+
+  /**
+   * Buffer BIGGER than input
+   * Single char column separator
+   * Mutiple char line separator
+   * 2 lines INPUT WITH Quates AND both line and column separator inside quotes
+   */
+  @Test
+  public void testBufferBiggerMultColSepWithQuotesAndBothSep(){
+    Map<String, String> map = Maps.newHashMap(singleChLineSingleChColumn);
+    map.put("s", MULTIPLE_CHARS_LINE_SEPARATOR); //override it
+
+    String v1 = fromTemplate(
+      ImmutableMap.of("s", MULTIPLE_CHARS_LINE_SEPARATOR,
+        "l", SINGLE_CHAR_COLUMN_SEPARATOR),
+      QUOTED1_1_WITH_2SEP);
+    map.put(LINE1_VAL1, v1);
+    String v2 = fromTemplate(
+      ImmutableMap.of("s", MULTIPLE_CHARS_LINE_SEPARATOR,
+        "l", SINGLE_CHAR_COLUMN_SEPARATOR),
+      QUOTED2_1_WITH_2SEP);
+    map.put(LINE2_VAL1, v2);
+
+    String v3 = fromTemplate(
+      ImmutableMap.of("s", MULTIPLE_CHARS_LINE_SEPARATOR,
+        "l", SINGLE_CHAR_COLUMN_SEPARATOR),
+      QUOTED1_2_WITH_2SEP);
+    map.put(LINE1_VAL2, v3);
+
+    String v4 = fromTemplate(
+      ImmutableMap.of("s", MULTIPLE_CHARS_LINE_SEPARATOR,
+        "l", SINGLE_CHAR_COLUMN_SEPARATOR),
+      QUOTED2_2_WITH_2SEP);
     map.put(LINE2_VAL2, v4);
     String input = fromTemplate(map, INPUT1_TEMPLATE);
     CsvReader r = new CsvReader(
