@@ -164,7 +164,7 @@ public class CsvReader {
           currentPosition,
           CsvColumnMetadata.builder()
             .position(currentPosition)
-            .name(headerStorage.value(p))
+            .name(headerValue(headerStorage.value(p)))
             .build());
         p = headerStorage.positionOf(csvColumnSeparator);
       }
@@ -173,7 +173,7 @@ public class CsvReader {
         columnPosition[0],
         CsvColumnMetadata.builder()
           .position(columnPosition[0])
-          .name(headerStorage.value())
+          .name(headerValue(headerStorage.value()))
           .build());
     } else {
       throw new IllegalArgumentException(
@@ -211,6 +211,30 @@ public class CsvReader {
             });
         }
       });
+  }
+
+  private String headerValue(String raw){
+    if (StringUtils.isEmpty(raw)){
+      throw new IllegalStateException("Header column cannot be empty");
+    }
+    if (raw.charAt(0) == '"'
+      && raw.charAt(raw.length() -1) != '"'
+      || raw.charAt(0) != '"'
+      && raw.charAt(raw.length() -1) == '"') {
+      throw new IllegalStateException(
+        String.format("Header column = '%s' must contain both start " +
+          "and end quotes"));
+    }
+    if (raw.charAt(0) == '"'){
+      String fixedValue = raw.substring(1, raw.length() - 1);
+      if (StringUtils.isEmpty(fixedValue)){
+        throw new IllegalStateException(
+          "Header column between quotes cannot be empty");
+      }
+      return fixedValue;
+    } else {
+      return raw;
+    }
   }
 
   private void handleColumn(

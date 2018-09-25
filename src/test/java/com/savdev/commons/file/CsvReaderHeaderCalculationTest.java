@@ -33,6 +33,10 @@ public class CsvReaderHeaderCalculationTest {
     "${col1}${colSep}${col2}${s}${val1}${colSep}${val2}${s}";
   static final String INPUT_SINGLE_LINE_TEMPLATE_WITHOUT_FINAL_SEP =
     "${col1}${colSep}${col2}${s}${val1}${colSep}${val2}";
+  static final String INPUT2_TEMPLATE_HEADER_QUOTED =
+    "\"${col1}\"${colSep}\"${col2}\"${s}" +
+      "${val1}${colSep}${val2}${s}" +
+      "${val3}${colSep}${val4}";
 
   static final Map<String, String> singleChLineSingleChColumn = new HashMap<>();
   static {
@@ -54,7 +58,8 @@ public class CsvReaderHeaderCalculationTest {
 
   /**
    * buffer size bigger than the fst line separator
-   * line separator - the single char
+   * line separator - the multi char separator
+   * column separator - the multi char separator
    */
   @Test
   public void testHeaderPositionBufferBiggerMultiCharSeparator() {
@@ -73,6 +78,28 @@ public class CsvReaderHeaderCalculationTest {
     validateHeaderMap(r);
   }
 
+  /**
+   * buffer size bigger than the fst line separator
+   * line separator - the multi char separator
+   * column separator - the multi char separator
+   * header values are quoted
+   */
+  @Test
+  public void testHeaderPositionBufferBiggerMultiCharSeparatorHeaderQuoted() {
+    Map<String, String> nm = Maps.newHashMap(singleChLineSingleChColumn);
+    //override values
+    nm.put("s", MULTIPLE_CHARS_LINE_SEPARATOR2);
+    nm.put("colSep", MULTI_CHAR_COLUMN_SEPARATOR);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(nm, INPUT2_TEMPLATE_HEADER_QUOTED),
+        StandardCharsets.UTF_8))
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR2)
+      .columnSeparator(MULTI_CHAR_COLUMN_SEPARATOR)
+      .build();
+    r.calculateHeaders();
+    validateHeaderMap(r);
+  }
 
   /**
    * buffer size bigger than the fst line separator
