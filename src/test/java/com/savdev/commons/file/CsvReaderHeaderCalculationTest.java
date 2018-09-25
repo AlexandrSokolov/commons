@@ -1,5 +1,6 @@
 package com.savdev.commons.file;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,7 +24,9 @@ public class CsvReaderHeaderCalculationTest {
 
   static final String SINGLE_CHAR_LINE_SEPARATOR = "|";
   static final String SINGLE_CHAR_COLUMN_SEPARATOR = ",";
+  static final String MULTI_CHAR_COLUMN_SEPARATOR = "||";
   static final String MULTIPLE_CHARS_LINE_SEPARATOR = "|||";
+  static final String MULTIPLE_CHARS_LINE_SEPARATOR2 = "{EOL}";
   static final String INPUT1_TEMPLATE =
     "${col1}${colSep}${col2}${s}${val1}${colSep}${val2}${s}${val3}${colSep}${val4}";
   static final String INPUT_SINGLE_LINE_TEMPLATE_WITH_FINAL_SEP =
@@ -48,6 +51,28 @@ public class CsvReaderHeaderCalculationTest {
     multiChLineSingleChColumn.putAll(singleChLineSingleChColumn);
     multiChLineSingleChColumn.put("s", MULTIPLE_CHARS_LINE_SEPARATOR);
   }
+
+  /**
+   * buffer size bigger than the fst line separator
+   * line separator - the single char
+   */
+  @Test
+  public void testHeaderPositionBufferBiggerMultiCharSeparator() {
+    Map<String, String> nm = Maps.newHashMap(singleChLineSingleChColumn);
+    nm.put("s", MULTIPLE_CHARS_LINE_SEPARATOR2);
+    nm.put("colSep", MULTI_CHAR_COLUMN_SEPARATOR);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(nm, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR2)
+      .columnSeparator(MULTI_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE)
+      .build();
+    r.calculateHeaders();
+    validateHeaderMap(r);
+  }
+
 
   /**
    * buffer size bigger than the fst line separator

@@ -363,4 +363,29 @@ public class CsvReaderHandleLineTest {
     Assert.assertEquals(LINE2_VAL2, r.csvRecord.get(COL2));
   }
 
+  /**
+   * buffer size bigger than the fst line separator
+   * line separator - the single char
+   */
+  @Test
+  public void testHeaderPositionBufferBiggerMultiCharSeparatorWithEmptyLine() {
+    Map<String, String> nm = Maps.newHashMap(singleChLineSingleChColumn);
+    nm.put("s", MULTIPLE_CHARS_LINE_SEPARATOR2);
+    nm.put("colSep", MULTI_CHAR_COLUMN_SEPARATOR);
+    nm.put("val2", "");
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(nm, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR2)
+      .columnSeparator(MULTI_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE)
+      .build();
+    r.calculateHeaders();
+    Assert.assertTrue(r.csvRecord.isEmpty());
+    r.handleCsvLine();
+    Assert.assertFalse(r.csvRecord.isEmpty());
+    Assert.assertEquals("", r.csvRecord.get(COL2));
+  }
+
 }

@@ -2,6 +2,7 @@ package com.savdev.commons.file;
 
 import com.google.common.collect.Maps;
 import com.savdev.commons.function.Executor;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
@@ -12,7 +13,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Spliterators;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -23,6 +23,7 @@ public class CsvReader {
   final Storage storage;
   final String csvLineSeparator;
   final String csvColumnSeparator;
+  final Charset encoding;
 
   //calculated state:
   final Map<Integer, CsvColumnMetadata> csvHeader = Maps.newLinkedHashMap();
@@ -38,6 +39,7 @@ public class CsvReader {
   ) {
     this.csvLineSeparator = csvLineSeparator;
     this.csvColumnSeparator = csvColumnSeparator;
+    this.encoding = encoding;
     this.storage = new Storage(bufferSize, input, encoding);
   }
 
@@ -150,18 +152,29 @@ public class CsvReader {
     if (fstLineSeparatorPosition.isFound){
       String header = storage.value(fstLineSeparatorPosition);
       final int[] columnPosition = {0};
-      Pattern.compile(
-        String.format("\\%s+",csvColumnSeparator))
-        .splitAsStream(header)
-        .forEach(column -> {
-          int currentPosition = columnPosition[0]++;
-          csvHeader.put(
-            currentPosition,
-            CsvColumnMetadata.builder()
-              .position(currentPosition)
-              .name(column)
-              .build());
-        });
+
+      Storage headerStorage = new Storage(
+        header.length(),
+        IOUtils.toInputStream(header, this.encoding),
+        this.encoding);
+      Position p = headerStorage.positionOf(csvColumnSeparator);
+      while (p.isFound){
+        int currentPosition = columnPosition[0]++;
+        csvHeader.put(
+          currentPosition,
+          CsvColumnMetadata.builder()
+            .position(currentPosition)
+            .name(headerStorage.value(p))
+            .build());
+        p = headerStorage.positionOf(csvColumnSeparator);
+      }
+      //handle the last column:
+      csvHeader.put(
+        columnPosition[0],
+        CsvColumnMetadata.builder()
+          .position(columnPosition[0])
+          .name(headerStorage.value())
+          .build());
     } else {
       throw new IllegalArgumentException(
         String.format("Could not find csv line separator %s, header = 's'",
@@ -233,7 +246,7 @@ public class CsvReader {
     Position separatorPosition = storage.positionOf(separator);
     if (separatorPosition.isFound) {
       String value = storage.value(separatorPosition);
-      if (value.charAt(0) == '"') {
+      if (value.length() > 0 && value.charAt(0) == '"') {
         csvHeader.get(columnPosition).setEndSeparator(
           String.format("\"%s", separator));
         csvHeader.get(columnPosition).setStartSeparator("\"");
