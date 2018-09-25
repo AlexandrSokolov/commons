@@ -13,12 +13,15 @@ public class CsvReaderStreamTest {
   @Test
   public void testStream(){
     final int[] processedLine = {0};
-    new CsvReader(
-      IOUtils.toInputStream(fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      ",",
-      BUFFER_SIZE).csvLines()
+    CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8)).encoding(StandardCharsets.UTF_8)
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      .columnSeparator(",")
+      .bufferSize(BUFFER_SIZE)
+      .build()
+      .csvLines()
       .forEach(csvRecordAsMap -> {
         if (processedLine[0] == 0) {
           Assert.assertTrue(csvRecordAsMap.size() == 2);
@@ -43,3 +46,4 @@ public class CsvReaderStreamTest {
     Assert.assertEquals(2, processedLine[0]);
   }
 }
+

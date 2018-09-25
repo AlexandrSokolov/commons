@@ -55,12 +55,15 @@ public class CsvReaderHeaderCalculationTest {
    */
   @Test
   public void testHeaderPositionBufferBiggerSingleCharSeparator() {
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      ",",
-      BUFFER_SIZE);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      //.encoding(StandardCharsets.UTF_8)
+      //.columnSeparator(",")
+      .bufferSize(BUFFER_SIZE)
+      .build();
     r.calculateHeaders();
     validateHeaderMap(r);
   }
@@ -71,13 +74,15 @@ public class CsvReaderHeaderCalculationTest {
    */
   @Test
   public void testHeaderPositionBufferBiggerMultipleCharsSeparator() {
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(fromTemplate(
-        multiChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      ",",
-      BUFFER_SIZE);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      //.encoding(StandardCharsets.UTF_8) default
+      //.columnSeparator(",") default
+      .bufferSize(BUFFER_SIZE)
+      .build();
     r.calculateHeaders();
     validateHeaderMap(r);
   }
@@ -88,12 +93,18 @@ public class CsvReaderHeaderCalculationTest {
    */
   @Test
   public void testHeaderPositionBufferEqualsSingleCharSeparator() {
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      ",",
-      fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE).indexOf(SINGLE_CHAR_LINE_SEPARATOR));
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(
+          singleChLineSingleChColumn, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      //.encoding(StandardCharsets.UTF_8) default
+      //.columnSeparator(",") default
+      .bufferSize(
+        fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE)
+          .indexOf(SINGLE_CHAR_LINE_SEPARATOR))
+      .build();
     r.calculateHeaders();
     validateHeaderMap(r);
   }
@@ -104,14 +115,18 @@ public class CsvReaderHeaderCalculationTest {
    */
   @Test
   public void testHeaderPositionBufferEqualsMultipleCharsSeparator() {
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(
-        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      ",",
-      fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE)
-        .indexOf(MULTIPLE_CHARS_LINE_SEPARATOR));
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(
+          multiChLineSingleChColumn, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      //.encoding(StandardCharsets.UTF_8) default
+      //.columnSeparator(",") default
+      .bufferSize(
+        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE)
+          .indexOf(MULTIPLE_CHARS_LINE_SEPARATOR))
+      .build();
     r.calculateHeaders();
     validateHeaderMap(r);
   }
@@ -122,12 +137,16 @@ public class CsvReaderHeaderCalculationTest {
    */
   @Test
   public void testHeaderPositionBufferSmallerSingleCharSeparator() {
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      ",",
-      2);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(
+          singleChLineSingleChColumn, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      //.encoding(StandardCharsets.UTF_8) default
+      //.columnSeparator(",") default
+      .bufferSize(2)
+      .build();
     r.calculateHeaders();
     validateHeaderMap(r);
   }
@@ -139,13 +158,16 @@ public class CsvReaderHeaderCalculationTest {
    */
   @Test
   public void testHeaderPositionBufferSmallerMultipleCharsSeparator() {
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(
-        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      ",",
-      4);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(
+          multiChLineSingleChColumn, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      //.encoding(StandardCharsets.UTF_8) default
+      //.columnSeparator(",") default
+      .bufferSize(4)
+      .build();
     r.calculateHeaders();
     validateHeaderMap(r);
   }
@@ -157,13 +179,15 @@ public class CsvReaderHeaderCalculationTest {
    */
   @Test
   public void testHeaderPositionBufferSmallerMultipleCharsSeparator2() {
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(
-        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE), StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      ",",
-      MULTIPLE_CHARS_LINE_SEPARATOR.length() - 1);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
+        fromTemplate(multiChLineSingleChColumn, INPUT1_TEMPLATE),
+        StandardCharsets.UTF_8))
+      //.encoding(StandardCharsets.UTF_8) default
+      //.columnSeparator(",") default
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      .bufferSize(MULTIPLE_CHARS_LINE_SEPARATOR.length() - 1)
+      .build();
     r.calculateHeaders();
     validateHeaderMap(r);
   }

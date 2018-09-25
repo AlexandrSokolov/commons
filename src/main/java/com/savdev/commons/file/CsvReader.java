@@ -4,8 +4,10 @@ import com.google.common.collect.Maps;
 import com.savdev.commons.function.Executor;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.validation.constraints.NotNull;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -16,6 +18,8 @@ import java.util.stream.StreamSupport;
 
 public class CsvReader {
 
+  private static int BUFFER_SIZE = 32768;
+
   final Storage storage;
   final String csvLineSeparator;
   final String csvColumnSeparator;
@@ -25,7 +29,7 @@ public class CsvReader {
   boolean noMoreData = false;
   Map<String, String> csvRecord = Maps.newHashMap();
 
-  public CsvReader(
+  private CsvReader(
     final InputStream input,
     final Charset encoding,
     final String csvLineSeparator,
@@ -35,6 +39,109 @@ public class CsvReader {
     this.csvLineSeparator = csvLineSeparator;
     this.csvColumnSeparator = csvColumnSeparator;
     this.storage = new Storage(bufferSize, input, encoding);
+  }
+
+  public static CsvReaderBuilder builder(){
+    return new CsvReaderBuilder();
+  }
+
+  public static class CsvReaderBuilder {
+    private InputStream input;
+    private Charset encoding = StandardCharsets.UTF_8;
+    private String csvLineSeparator = System.lineSeparator();
+    private String csvColumnSeparator = ",";
+    private int bufferSize = BUFFER_SIZE;
+
+    public CsvReaderBuilder input(
+      @NotNull final InputStream input) {
+      if (input == null){
+        throw new IllegalArgumentException(
+          "Cannot create reader, input cannot be null");
+      }
+      this.input = input;
+      return this;
+    }
+
+    public CsvReaderBuilder encoding(
+      @NotNull final Charset encoding) {
+      if (encoding == null) {
+        throw new IllegalArgumentException(
+          "Cannot create reader, encoding cannot be null");
+      }
+      this.encoding = encoding;
+      return this;
+    }
+
+    public CsvReaderBuilder lineSeparator(
+      @NotNull final String csvLineSeparator) {
+      if ( StringUtils.isEmpty(csvLineSeparator)){
+        throw new IllegalArgumentException(
+          "Cannot create reader, line separator cannot be empty");
+      }
+      this.csvLineSeparator = csvLineSeparator;
+      return this;
+    }
+
+    public CsvReaderBuilder columnSeparator(
+      @NotNull final String csvColumnSeparator) {
+      if ( StringUtils.isEmpty(csvColumnSeparator)){
+        throw new IllegalArgumentException(
+          "Cannot create reader, column separator cannot be empty");
+      }
+      this.csvColumnSeparator = csvColumnSeparator;
+      return this;
+    }
+
+    public CsvReaderBuilder bufferSize(
+      final int bufferSize) {
+      if (bufferSize == 0){
+        throw new IllegalArgumentException(
+          "Cannot create reader, buffer size cannot be 0");
+      }
+      this.bufferSize = bufferSize;
+      return this;
+    }
+
+    public CsvReader build() {
+      if (this.input == null){
+        throw new IllegalArgumentException(
+          "Cannot create reader, input is not defined");
+      }
+      return new CsvReader(
+        input,
+        encoding,
+        csvLineSeparator,
+        csvColumnSeparator,
+        bufferSize);
+    }
+  }
+
+  public Stream<Map<String, String>> csvLines(){
+    Iterator var1 = new Iterator<Map<String, String>>() {
+
+      public boolean hasNext() {
+        if (csvHeader.isEmpty()){
+          CsvReader.this.calculateHeaders();
+        }
+        if (CsvReader.this.noMoreData){
+          return false;
+        } else {
+          CsvReader.this.handleCsvLine();
+          return !CsvReader.this.csvRecord.isEmpty();
+        }
+      }
+
+      public Map<String, String> next() {
+        if (CsvReader.this.csvRecord.isEmpty()){
+          throw new NoSuchElementException();
+        } else {
+          return CsvReader.this.csvRecord;
+        }
+      }
+    };
+
+    return StreamSupport.stream(
+      Spliterators.spliteratorUnknownSize(var1, 272), false);
   }
 
   void calculateHeaders(){
@@ -84,11 +191,11 @@ public class CsvReader {
         } else {
           handleColumn(entry.getKey(),
             csvColumnSeparator, ()-> {
-            throw new IllegalStateException(
-              String.format(
-                "Could not extract a value for not last column, current line = '%s'",
-                storage.value()));
-          });
+              throw new IllegalStateException(
+                String.format(
+                  "Could not extract a value for not last column, current line = '%s'",
+                  storage.value()));
+            });
         }
       });
   }
@@ -153,33 +260,5 @@ public class CsvReader {
     } else {
       notFound.execute();
     }
-  }
-
-  Stream<Map<String, String>> csvLines(){
-    Iterator var1 = new Iterator<Map<String, String>>() {
-
-      public boolean hasNext() {
-        if (csvHeader.isEmpty()){
-          CsvReader.this.calculateHeaders();
-        }
-        if (CsvReader.this.noMoreData){
-          return false;
-        } else {
-          CsvReader.this.handleCsvLine();
-          return !CsvReader.this.csvRecord.isEmpty();
-        }
-      }
-
-      public Map<String, String> next() {
-        if (CsvReader.this.csvRecord.isEmpty()){
-          throw new NoSuchElementException();
-        } else {
-          return CsvReader.this.csvRecord;
-        }
-      }
-    };
-
-    return StreamSupport.stream(
-      Spliterators.spliteratorUnknownSize(var1, 272), false);
   }
 }

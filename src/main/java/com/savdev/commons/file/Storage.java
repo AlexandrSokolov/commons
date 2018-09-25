@@ -8,7 +8,10 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Storage {
+/**
+ * Is not expected to be public available. Used only by CsvReader
+ */
+class Storage {
 
   private final static int UNLIMITED = -1;
 
@@ -18,7 +21,6 @@ public class Storage {
   final List<BufferInfo> storage = new LinkedList<>();
   final BufferedReader reader;
   Position currentReadPosition = Position.builder().build();
- // Position nextPosition = Position.builder().build();
 
   public Storage(
     final int bufferSize,
@@ -50,7 +52,7 @@ public class Storage {
 
   private BufferInfo getStoredBuffer(){
     if (currentReadPosition.listPosition > 0
-        && !storage.isEmpty()){
+      && !storage.isEmpty()){
       return storage.get(0);
     } else {
       char[] a = new char[bufferSize];
@@ -85,9 +87,6 @@ public class Storage {
       read();
     }
     int totalBufferSize = bufferSize(currentReadPosition, toPosition);
-//    if (totalBufferSize == 0){
-//      return "";
-//    }
     char[] totalBuffer = new char[totalBufferSize];
 
     int currentTargetPosition = 0;
@@ -282,20 +281,6 @@ public class Storage {
         .build();
       storage.remove(0); //remove the 1st buffer
     }
-//
-//    for(int l = 0; l< storage.size(); l ++) {
-//      for (int i = currentReadPosition.arrayPosition;
-//           i < storage.get(l).actualSize; i++) {
-//        sum++;
-//        if (sum == length){
-//          currentReadPosition = Position.builder()
-//            .listPosition(l)
-//            .arrayPosition(i+1)
-//            .build();
-//          return true;
-//        }
-//      }
-//    }
     if (read()){
       return movePositionAfter(totalLength, currentSum);
     } else {

@@ -37,16 +37,17 @@ public class CsvReaderHandleLineTest {
    * The last line DOES contain final column separator
    */
   @Test
-  public void testBufferBiggerWithoutQuatesSingleLine(){
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(
+  public void testBufferBiggerWithoutQuatesSingleLine() {
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
         fromTemplate(singleChLineSingleChColumn,
           INPUT_SINGLE_LINE_TEMPLATE_WITH_FINAL_SEP),
-        StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      BUFFER_SIZE);
+        StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE)
+      .build();
     r.calculateHeaders();
     runAndValidate1NotEmptyLines(r);
   }
@@ -58,15 +59,17 @@ public class CsvReaderHandleLineTest {
    * The last line DOES contain final column separator
    */
   @Test
-  public void testBufferSmallerWithoutQuatesSingleLine(){
-    String input = fromTemplate(singleChLineSingleChColumn,
+  public void testBufferSmallerWithoutQuatesSingleLine() {
+    String input = fromTemplate(
+      singleChLineSingleChColumn,
       INPUT_SINGLE_LINE_TEMPLATE_WITH_FINAL_SEP);
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      input.length() - 5);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(input, StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(input.length() - 5)
+      .build();
     r.calculateHeaders();
     runAndValidate1NotEmptyLines(r);
   }
@@ -78,16 +81,17 @@ public class CsvReaderHandleLineTest {
    * The last line DOES NOT contain final column separator
    */
   @Test
-  public void testBufferBiggerWithoutQuatesSingleLine2(){
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(
+  public void testBufferBiggerWithoutQuatesSingleLine2() {
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
         fromTemplate(singleChLineSingleChColumn,
           INPUT_SINGLE_LINE_TEMPLATE_WITHOUT_FINAL_SEP),
-        StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      BUFFER_SIZE);
+        StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE)
+      .build();
     r.calculateHeaders();
     runAndValidate1NotEmptyLines(r);
   }
@@ -99,15 +103,16 @@ public class CsvReaderHandleLineTest {
    * The last line DOES NOT contain final column separator
    */
   @Test
-  public void testBufferSmallerWithoutQuatesSingleLine2(){
+  public void testBufferSmallerWithoutQuatesSingleLine2() {
     String input = fromTemplate(singleChLineSingleChColumn,
       INPUT_SINGLE_LINE_TEMPLATE_WITHOUT_FINAL_SEP);
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      input.length() - 5);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(input, StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(input.length() - 5)
+      .build();
     r.calculateHeaders();
     runAndValidate1NotEmptyLines(r);
   }
@@ -119,15 +124,16 @@ public class CsvReaderHandleLineTest {
    * 2 lines INPUT
    */
   @Test
-  public void testBufferBiggerSingColSepWithoutQuotes(){
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(
+  public void testBufferBiggerSingColSepWithoutQuotes() {
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(
         fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE),
-        StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      BUFFER_SIZE);
+        StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE)
+      .build();
     r.calculateHeaders();
     runAndValidate2NotEmptyLines(r);
   }
@@ -139,14 +145,15 @@ public class CsvReaderHandleLineTest {
    * 2 lines INPUT
    */
   @Test
-  public void testBufferSmallerSingColSepWithoutQuotes(){
+  public void testBufferSmallerSingColSepWithoutQuotes() {
     String input = fromTemplate(singleChLineSingleChColumn, INPUT1_TEMPLATE);
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      SINGLE_CHAR_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      input.length() - 5);
+    CsvReader r = CsvReader.builder().input(
+      IOUtils.toInputStream(input, StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(SINGLE_CHAR_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(input.length() - 5)
+      .build();
     r.calculateHeaders();
     runAndValidate2NotEmptyLines(r);
   }
@@ -158,16 +165,17 @@ public class CsvReaderHandleLineTest {
    * 2 lines INPUT
    */
   @Test
-  public void testBufferSmallerMultColSepWithoutQuotes(){
+  public void testBufferSmallerMultColSepWithoutQuotes() {
     Map<String, String> map = Maps.newHashMap(singleChLineSingleChColumn);
     map.put("s", MULTIPLE_CHARS_LINE_SEPARATOR); //override it
     String input = fromTemplate(map, INPUT1_TEMPLATE);
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      input.length() - 5);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(input, StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(input.length() - 5)
+      .build();
     r.calculateHeaders();
     runAndValidate2NotEmptyLines(r);
   }
@@ -179,21 +187,20 @@ public class CsvReaderHandleLineTest {
    * 2 lines INPUT
    */
   @Test
-  public void testBufferBiggerMultColSepWithoutQuotes(){
+  public void testBufferBiggerMultColSepWithoutQuotes() {
     Map<String, String> map = Maps.newHashMap(singleChLineSingleChColumn);
     map.put("s", MULTIPLE_CHARS_LINE_SEPARATOR); //override it
     String input = fromTemplate(map, INPUT1_TEMPLATE);
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      BUFFER_SIZE);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(input, StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE)
+      .build();
     r.calculateHeaders();
     runAndValidate2NotEmptyLines(r);
   }
-
-
 
 
   /**
@@ -203,7 +210,7 @@ public class CsvReaderHandleLineTest {
    * 2 lines INPUT WITH Quates
    */
   @Test
-  public void testBufferBiggerMultColSepWithQuotes(){
+  public void testBufferBiggerMultColSepWithQuotes() {
     Map<String, String> map = Maps.newHashMap(singleChLineSingleChColumn);
     map.put("s", MULTIPLE_CHARS_LINE_SEPARATOR); //override it
     map.put(LINE1_VAL1, QUOTED1_1);
@@ -211,12 +218,14 @@ public class CsvReaderHandleLineTest {
     map.put(LINE1_VAL2, QUOTED1_2);
     map.put(LINE2_VAL2, QUOTED2_2);
     String input = fromTemplate(map, INPUT1_TEMPLATE);
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      BUFFER_SIZE);
+    CsvReader r = CsvReader.builder()
+      .input(
+        IOUtils.toInputStream(input, StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE)
+      .build();
     r.calculateHeaders();
     Assert.assertTrue(r.csvRecord.isEmpty());
     r.handleCsvLine();
@@ -237,7 +246,7 @@ public class CsvReaderHandleLineTest {
    * 2 lines INPUT WITH Quates AND line separator inside
    */
   @Test
-  public void testBufferBiggerMultColSepWithQuotesAndSep(){
+  public void testBufferBiggerMultColSepWithQuotesAndSep() {
     Map<String, String> map = Maps.newHashMap(singleChLineSingleChColumn);
     map.put("s", MULTIPLE_CHARS_LINE_SEPARATOR); //override it
     String v1 = fromTemplate(
@@ -259,23 +268,24 @@ public class CsvReaderHandleLineTest {
       QUOTED2_2_WITH_SEP);
     map.put(LINE2_VAL2, v4);
     String input = fromTemplate(map, INPUT1_TEMPLATE);
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      BUFFER_SIZE);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(input, StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE)
+      .build();
     r.calculateHeaders();
     Assert.assertTrue(r.csvRecord.isEmpty());
     r.handleCsvLine();
     Assert.assertFalse(r.csvRecord.isEmpty());
-    Assert.assertEquals(v1.substring(1, v1.length()-1), r.csvRecord.get(COL1));
-    Assert.assertEquals(v3.substring(1, v1.length()-1), r.csvRecord.get(COL2));
+    Assert.assertEquals(v1.substring(1, v1.length() - 1), r.csvRecord.get(COL1));
+    Assert.assertEquals(v3.substring(1, v1.length() - 1), r.csvRecord.get(COL2));
 
     r.handleCsvLine();
     Assert.assertFalse(r.csvRecord.isEmpty());
-    Assert.assertEquals(v2.substring(1, v1.length()-1), r.csvRecord.get(COL1));
-    Assert.assertEquals(v4.substring(1, v1.length()-1), r.csvRecord.get(COL2));
+    Assert.assertEquals(v2.substring(1, v1.length() - 1), r.csvRecord.get(COL1));
+    Assert.assertEquals(v4.substring(1, v1.length() - 1), r.csvRecord.get(COL2));
   }
 
   /**
@@ -285,7 +295,7 @@ public class CsvReaderHandleLineTest {
    * 2 lines INPUT WITH Quates AND both line and column separator inside quotes
    */
   @Test
-  public void testBufferBiggerMultColSepWithQuotesAndBothSep(){
+  public void testBufferBiggerMultColSepWithQuotesAndBothSep() {
     Map<String, String> map = Maps.newHashMap(singleChLineSingleChColumn);
     map.put("s", MULTIPLE_CHARS_LINE_SEPARATOR); //override it
 
@@ -312,26 +322,26 @@ public class CsvReaderHandleLineTest {
       QUOTED2_2_WITH_2SEP);
     map.put(LINE2_VAL2, v4);
     String input = fromTemplate(map, INPUT1_TEMPLATE);
-    CsvReader r = new CsvReader(
-      IOUtils.toInputStream(input, StandardCharsets.UTF_8),
-      StandardCharsets.UTF_8,
-      MULTIPLE_CHARS_LINE_SEPARATOR,
-      SINGLE_CHAR_COLUMN_SEPARATOR,
-      BUFFER_SIZE);
+    CsvReader r = CsvReader.builder()
+      .input(IOUtils.toInputStream(input, StandardCharsets.UTF_8))
+      .encoding(StandardCharsets.UTF_8)
+      .lineSeparator(MULTIPLE_CHARS_LINE_SEPARATOR)
+      .columnSeparator(SINGLE_CHAR_COLUMN_SEPARATOR)
+      .bufferSize(BUFFER_SIZE).build();
     r.calculateHeaders();
     Assert.assertTrue(r.csvRecord.isEmpty());
     r.handleCsvLine();
     Assert.assertFalse(r.csvRecord.isEmpty());
-    Assert.assertEquals(v1.substring(1, v1.length()-1), r.csvRecord.get(COL1));
-    Assert.assertEquals(v3.substring(1, v1.length()-1), r.csvRecord.get(COL2));
+    Assert.assertEquals(v1.substring(1, v1.length() - 1), r.csvRecord.get(COL1));
+    Assert.assertEquals(v3.substring(1, v1.length() - 1), r.csvRecord.get(COL2));
 
     r.handleCsvLine();
     Assert.assertFalse(r.csvRecord.isEmpty());
-    Assert.assertEquals(v2.substring(1, v1.length()-1), r.csvRecord.get(COL1));
-    Assert.assertEquals(v4.substring(1, v1.length()-1), r.csvRecord.get(COL2));
+    Assert.assertEquals(v2.substring(1, v1.length() - 1), r.csvRecord.get(COL1));
+    Assert.assertEquals(v4.substring(1, v1.length() - 1), r.csvRecord.get(COL2));
   }
 
-  private void runAndValidate1NotEmptyLines(final CsvReader r){
+  private void runAndValidate1NotEmptyLines(final CsvReader r) {
     Assert.assertTrue(r.csvRecord.isEmpty());
     r.handleCsvLine(); //1st line
     Assert.assertFalse(r.csvRecord.isEmpty());
@@ -341,7 +351,7 @@ public class CsvReaderHandleLineTest {
     Assert.assertTrue(r.csvRecord.isEmpty());
   }
 
-  private void runAndValidate2NotEmptyLines(final CsvReader r){
+  private void runAndValidate2NotEmptyLines(final CsvReader r) {
     Assert.assertTrue(r.csvRecord.isEmpty());
     r.handleCsvLine(); //1st line
     Assert.assertFalse(r.csvRecord.isEmpty());
